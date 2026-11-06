@@ -88,6 +88,14 @@ void getGrade(float avg) {
     else {printf("评分: D\n");}
 }
 
+void getTotalScore(const Student *s) {
+    float sum = 0;
+    for (int i = 0;i < s->num_subjects;i++) {
+        sum += s->marks[i];
+    }
+    printf("总分为: %.2f\n", sum);
+}
+
 void printReport(const Student *s) {
     printLine();
     printf("学生成绩单\n");
@@ -98,6 +106,7 @@ void printReport(const Student *s) {
     printLine();
     printGrades(s);
     printLine();
+    getTotalScore(s);
     float avg = getAverage(s);
     printLine();
     getMinMax(s);
@@ -126,10 +135,16 @@ int main() {
 
         printf("\n录入完成\n\n\n");
         printReport(&s);
-
-        printf("需要输出另外一位同学的成绩单吗?(y/n):");
-        scanf(" %c", &again);
-        while (again != 'y' && again != 'n') printf("只能输入y或n!");
+        while (1) {
+            printf("需要输出另外一位同学的成绩单吗?(y/n):");
+            scanf(" %c", &again);
+            if (again != 'y' && again != 'n') {
+                printf("只能输入y或n!\n");
+                continue;
+            }
+            break;
+        }
+        
         while ((ch = getchar()) != '\n' && ch != EOF);
     } while(again == 'y');
     
