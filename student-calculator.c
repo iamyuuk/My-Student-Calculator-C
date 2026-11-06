@@ -7,6 +7,7 @@
 typedef struct {
     char name[MAX_LENTH];
     float marks[MAX_SUBJECTS];
+    char subject_names[MAX_SUBJECTS][MAX_LENTH];
     int num_subjects;
 } Student;
 
@@ -26,11 +27,16 @@ int readSubjectNum() {
     }
 }
 
-float readMarks(int subject_num) {
+float readMarks(int subject_num, Student *s) {
     float mark;
     while (1) {
-        printf("\n请输入科目%d的成绩:", subject_num);
+        printf("\n请输入科目%d的名称:", subject_num);
+        fgets(s->subject_names[subject_num - 1], MAX_LENTH, stdin);
+        s->subject_names[subject_num - 1][strcspn(s->subject_names[subject_num - 1], "\n")] = '\0';
+        printf("\n请输入%s的成绩:",s->subject_names[subject_num - 1]);
         if (scanf("%f", &mark) == 1 && mark >= 1 && mark <= 100) {
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
             return mark;
         }
         printf("\n请输入1~100的分数！");
@@ -41,7 +47,7 @@ float readMarks(int subject_num) {
 void printGrades(const Student *s) {
     int num = s->num_subjects;
     for (int i = 0;i < num;i++) {
-        printf("科目%d的成绩为: %.2f\n", i+1, s->marks[i]);
+        printf("%s的成绩为: %.2f\n", s->subject_names[i], s->marks[i]);
     }
 }
 
@@ -103,6 +109,7 @@ void printReport(const Student *s) {
 int main() {
     char again;
     Student s;
+    int ch;
     printLine();
     printf("欢迎来到学生成绩计算系统\n");
     printLine();
@@ -110,12 +117,11 @@ int main() {
         printf("\n请输入姓名:");
         fgets(s.name, MAX_LENTH, stdin);
         s.name[strcspn(s.name, "\n")] = '\0';
-    
         s.num_subjects = readSubjectNum();
-
-        printf("\n接下来将输入各科成绩：");
+        while ((ch = getchar()) != '\n' && ch != EOF);
+        printf("\n接下来将输入各科名称和成绩：");
         for (int i = 0;i<s.num_subjects;i++) {
-            s.marks[i] = readMarks(i + 1);
+            s.marks[i] = readMarks(i + 1, &s);
         }
 
         printf("\n录入完成\n\n\n");
@@ -124,7 +130,6 @@ int main() {
         printf("需要输出另外一位同学的成绩单吗?(y/n):");
         scanf(" %c", &again);
         while (again != 'y' && again != 'n') printf("只能输入y或n!");
-        int ch;
         while ((ch = getchar()) != '\n' && ch != EOF);
     } while(again == 'y');
     
