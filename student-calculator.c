@@ -11,6 +11,14 @@ typedef struct {
     int num_subjects;
 } Student;
 
+const float grade_boundares[] = {
+    80.0f, 70.0f, 60.0f, 0
+};
+
+const char *grade_names[] = {
+    "A", "B", "C", "D"
+};
+
 void printLine() {
     printf("-------------------\n");
 }
@@ -82,10 +90,12 @@ void getMinMax(const Student *s) {
 }
 
 void getGrade(float avg) {
-    if (avg >= 80) {printf("评分: A\n");}
-    else if (avg >= 70) {printf("评分: B\n");}
-    else if (avg >= 60) {printf("评分: C\n");}
-    else {printf("评分: D\n");}
+    for (int i = 0;i < sizeof(grade_boundares) / sizeof(grade_boundares[0]);i++) {
+        if (avg >= grade_boundares[i]) {
+            printf("评分: %s", grade_names[i]);
+            break;
+        }
+    }
 }
 
 void getTotalScore(const Student *s) {
