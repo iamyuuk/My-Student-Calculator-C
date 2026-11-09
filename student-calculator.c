@@ -10,6 +10,7 @@ typedef struct {
     float marks[MAX_SUBJECTS];
     char subject_names[MAX_SUBJECTS][MAX_LENTH];
     int num_subjects;
+    float avg;
 } Student;
 
 const float grade_boundares[] = {
@@ -60,13 +61,13 @@ void printGrades(const Student *s) {
     }
 }
 
-float getAverage(const Student *s) {
+float getAverage(Student *s) {
     float avg, sum = 0;
     for (int i = 0;i<s->num_subjects;i++) {
         sum += s->marks[i];
     }
     avg = sum / s->num_subjects;
-    printf("平均成绩为: %.2f\n", avg);
+    s->avg = avg;
     return avg;
 }
 
@@ -117,10 +118,11 @@ void printReport(const Student *s) {
     printLine();
     getTotalScore(s);
     float avg = getAverage(s);
+    printf("平均成绩为: %.2f\n", avg);
     printLine();
     getMinMax(s);
     printLine();
-    getGrade(avg);
+    getGrade(s->avg);
 
 }
 
@@ -138,6 +140,19 @@ void readStudents(Student *s, int mem) {
         }
 
         printf("\n录入完成\n\n\n");
+        s->avg = getAverage(s);
+}
+
+void sortStudentsByAverage(Student s[], int mem) {
+    for (int i = 0;i < mem - 1;i++) {
+        for (int j = 0;j < mem - 1 - i;j++) {
+            if (s[j].avg < s[j+1].avg) {
+                Student temp = s[j];
+                s[j] = s[j+1];
+                s[j+1] = temp;
+            }
+        }
+    }
 }
 
 int main() {
@@ -159,11 +174,13 @@ int main() {
     for (int i = 0;i<num;i++) {
         readStudents(&s[i], i+1);
     }
+    sortStudentsByAverage(s, num);
     printLine();
     printf("学生成绩单\n");
     printLine();
     for (int i = 0;i<num;i++) {
         printReport(&s[i]);
+        printf("\n\n\n");
     }
     return 0;
 }
