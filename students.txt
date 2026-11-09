@@ -1,0 +1,14 @@
+2
+thy
+2
+yuwen
+90.00
+2
+shuxue
+80.00
+2
+myh
+1
+computer
+70.00
+

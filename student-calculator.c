@@ -165,6 +165,27 @@ const Student *findStudentByName(const Student s[], int count, const char *name)
     return NULL;
 }
 
+void saveStudentsToFile(const Student s[], int count) {
+    FILE *fp = fopen("students.txt", "w");
+    if (fp == NULL) {
+        printf("写入文件失败\n");
+    } else {
+        for (int i = 0;i < count;i++) {
+            fprintf(fp, "%d\n", count);
+            fprintf(fp, "%s\n", s[i].name);
+            int num = s[i].num_subjects;
+            for (int j = 0;j < num;j++) {
+                fprintf(fp, "%d\n", s[i].num_subjects);
+                fprintf(fp, "%s\n", s[i].subject_names[j]);
+                fprintf(fp, "%.2f\n", s[i].marks[j]);
+
+            }
+        }
+        fprintf(fp, "\n");
+        fclose(fp);
+    }
+}
+
 int main() {
     int num;
     printLine();
@@ -191,27 +212,29 @@ int main() {
         printReport(&s[i]);
         printf("\n\n\n");
     }
-    while (1) {
-        printf("\n是否需要查找指定学生成绩?(y/n)");
-        char n;
-        scanf(" %c", &n);
-        clearInputBuffer();
-        if (n == 'y') {
-            char name[MAX_LENTH];
-            printf("\n请输入要查找的学生姓名:");
-            fgets(name, MAX_LENTH, stdin);
-            name[strcspn(name, "\n")] = '\0';
-            const Student *result = findStudentByName(s, num, name);
-            if (result != NULL) {
-                printReport(result);
-            } else { printf("未找到该学生\n"); }
+    saveStudentsToFile(s, num);
+    if (num > 1) {
+        while (1) {
+            printf("\n是否需要查找指定学生成绩?(y/n)");
+            char n;
+            scanf(" %c", &n);
+            clearInputBuffer();
+            if (n == 'y') {
+                char name[MAX_LENTH];
+                printf("\n请输入要查找的学生姓名:");
+                fgets(name, MAX_LENTH, stdin);
+                name[strcspn(name, "\n")] = '\0';
+                const Student *result = findStudentByName(s, num, name);
+                if (result != NULL) {
+                    printReport(result);
+                } else { printf("未找到该学生\n"); }
             break;
-        } else if (n == 'n') {
-
-            break;
-        } else {
-            printf("\n请输入y或n!");
-            continue;
+            } else if (n == 'n') {
+                break;
+            } else {
+                printf("\n请输入y或n!");
+                continue;
+            }
         }
     }
     return 0;
