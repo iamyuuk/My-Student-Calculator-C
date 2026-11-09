@@ -1,14 +1,12 @@
 2
 thy
 2
-yuwen
-90.00
-2
-shuxue
+yw
 80.00
-2
+77
+88.00
 myh
 1
-computer
-70.00
+pc
+78.00
 

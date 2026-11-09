@@ -170,20 +170,71 @@ void saveStudentsToFile(const Student s[], int count) {
     if (fp == NULL) {
         printf("写入文件失败\n");
     } else {
+        fprintf(fp, "%d\n", count);
         for (int i = 0;i < count;i++) {
-            fprintf(fp, "%d\n", count);
             fprintf(fp, "%s\n", s[i].name);
             int num = s[i].num_subjects;
+            fprintf(fp, "%d\n", s[i].num_subjects);
             for (int j = 0;j < num;j++) {
-                fprintf(fp, "%d\n", s[i].num_subjects);
                 fprintf(fp, "%s\n", s[i].subject_names[j]);
                 fprintf(fp, "%.2f\n", s[i].marks[j]);
-
             }
         }
         fprintf(fp, "\n");
         fclose(fp);
     }
+}
+
+int loadStudentsFromFile(Student s[], int max_count) {
+    FILE *fp = fopen("students.txt", "r");
+    if (fp == NULL) { return -1; }
+    char line[MAX_LENTH];
+    int count;
+    if (fgets(line, MAX_LENTH, fp) == NULL) {
+        fclose(fp);
+        return -1;
+    }
+    if (sscanf(line, "%d", &count) != 1) {
+        fclose(fp);
+        return -1;
+    }
+    if (count < 1 || count > max_count) {
+        printf("文件中的学生人数不合法\n");
+        fclose(fp);
+        return -1;
+    }
+    for (int i = 0;i < count;i++) {
+        if (fgets(s[i].name, MAX_LENTH, fp) == NULL) {
+            fclose(fp);
+            return -1;
+        }
+        s[i].name[strcspn(s[i].name, "\n")] = '\0';
+
+        if (fgets(line, MAX_LENTH, fp) == NULL ||
+        sscanf(line, "%d", &s[i].num_subjects) != 1 ||
+        s[i].num_subjects < 1 ||
+        s[i].num_subjects > MAX_SUBJECTS) {
+
+        fclose(fp);
+        return -1;
+        }
+        for (int j = 0;j < s[i].num_subjects;j++) {
+            if (fgets(s[i].subject_names[j], MAX_LENTH, fp) == NULL) {
+                fclose(fp);
+                return -1;
+            }
+            s[i].subject_names[j][strcspn(s[i].subject_names[j], "\n")] = '\0';
+            if (fgets(line, MAX_LENTH, fp) == NULL ||
+            sscanf(line, "%f", &s[i].marks[j]) != 1) {
+                fclose(fp);
+                return -1;
+            }
+        }
+        s[i].avg = getAverage(&s[i]);
+    }
+    fclose(fp);
+
+    return count;
 }
 
 int main() {
@@ -192,6 +243,23 @@ int main() {
     Student s[MAX_STUDENTS];
     printf("欢迎来到学生成绩计算系统\n");
     printLine();
+
+
+    Student loaded[MAX_STUDENTS];
+
+    int loadedCount = loadStudentsFromFile(loaded, MAX_STUDENTS);
+
+    if (loadedCount == -1) {
+        printf("读取学生数据失败！\n");
+    } else {
+        printf("成功读取 %d 名学生！\n", loadedCount);
+
+        for (int i = 0; i < loadedCount; i++) {
+        printReport(&loaded[i]);
+    }
+}
+
+
     while (1) {
         printf("请输入学生人数: ");
         if (scanf("%d", &num) == 1 && num >= 1 && num <= MAX_STUDENTS) {
