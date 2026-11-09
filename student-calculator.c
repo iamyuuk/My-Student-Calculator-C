@@ -3,6 +3,7 @@
 
 #define MAX_LENTH 50
 #define MAX_SUBJECTS 10
+#define MAX_STUDENTS 50
 
 typedef struct {
     char name[MAX_LENTH];
@@ -92,7 +93,7 @@ void getMinMax(const Student *s) {
 void getGrade(float avg) {
     for (int i = 0;i < sizeof(grade_boundares) / sizeof(grade_boundares[0]);i++) {
         if (avg >= grade_boundares[i]) {
-            printf("评分: %s", grade_names[i]);
+            printf("评分: %s\n", grade_names[i]);
             break;
         }
     }
@@ -107,9 +108,7 @@ void getTotalScore(const Student *s) {
 }
 
 void printReport(const Student *s) {
-    printLine();
-    printf("学生成绩单\n");
-    printLine();
+    
     printf("学生姓名: %s\n", s->name);
     printLine();
     printf("科目数: %d\n", s->num_subjects);
@@ -125,39 +124,46 @@ void printReport(const Student *s) {
 
 }
 
-int main() {
+void readStudents(Student *s, int mem) {
     char again;
-    Student s;
     int ch;
-    printLine();
-    printf("欢迎来到学生成绩计算系统\n");
-    printLine();
-    do {
-        printf("\n请输入姓名:");
-        fgets(s.name, MAX_LENTH, stdin);
-        s.name[strcspn(s.name, "\n")] = '\0';
-        s.num_subjects = readSubjectNum();
+        printf("\n请输入学生%d姓名:", mem);
+        fgets(s->name, MAX_LENTH, stdin);
+        s->name[strcspn(s->name, "\n")] = '\0';
+        s->num_subjects = readSubjectNum();
         while ((ch = getchar()) != '\n' && ch != EOF);
         printf("\n接下来将输入各科名称和成绩：");
-        for (int i = 0;i<s.num_subjects;i++) {
-            s.marks[i] = readMarks(i + 1, &s);
+        for (int i = 0;i<s->num_subjects;i++) {
+            s->marks[i] = readMarks(i + 1, s);
         }
 
         printf("\n录入完成\n\n\n");
-        printReport(&s);
-        while (1) {
-            printf("需要输出另外一位同学的成绩单吗?(y/n):");
-            scanf(" %c", &again);
-            if (again != 'y' && again != 'n') {
-                printf("只能输入y或n!\n");
-                continue;
-            }
+}
+
+int main() {
+    int num;
+    int ch;
+    printLine();
+    Student s[MAX_STUDENTS];
+    printf("欢迎来到学生成绩计算系统\n");
+    printLine();
+    while (1) {
+        printf("请输入学生人数: ");
+        if (scanf("%d", &num) == 1 && num >= 1 && num <= MAX_STUDENTS) {
+            while ((ch = getchar()) != '\n' && ch != EOF);
             break;
         }
-        
+        printf("请输入1到%d之间的学生人数！", MAX_STUDENTS);
         while ((ch = getchar()) != '\n' && ch != EOF);
-    } while(again == 'y');
-    
-
+    }
+    for (int i = 0;i<num;i++) {
+        readStudents(&s[i], i+1);
+    }
+    printLine();
+    printf("学生成绩单\n");
+    printLine();
+    for (int i = 0;i<num;i++) {
+        printReport(&s[i]);
+    }
     return 0;
 }
