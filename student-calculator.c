@@ -21,6 +21,11 @@ const char *grade_names[] = {
     "A", "B", "C", "D"
 };
 
+void clearInputBuffer() {
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
+}
+
 void printLine() {
     printf("-------------------\n");
 }
@@ -33,7 +38,7 @@ int readSubjectNum() {
             return n;
         }
         printf("\n请输入1到%d的科目数量！", MAX_SUBJECTS);
-        while (getchar() != '\n');
+        clearInputBuffer();
     }
 }
 
@@ -45,12 +50,11 @@ float readMarks(int subject_num, Student *s) {
         s->subject_names[subject_num - 1][strcspn(s->subject_names[subject_num - 1], "\n")] = '\0';
         printf("\n请输入%s的成绩:",s->subject_names[subject_num - 1]);
         if (scanf("%f", &mark) == 1 && mark >= 1 && mark <= 100) {
-            int ch;
-            while ((ch = getchar()) != '\n' && ch != EOF);
+            clearInputBuffer();
             return mark;
         }
         printf("\n请输入1~100的分数！");
-        while (getchar() != '\n');
+        clearInputBuffer();
     }
 }
 
@@ -61,14 +65,12 @@ void printGrades(const Student *s) {
     }
 }
 
-float getAverage(Student *s) {
-    float avg, sum = 0;
+float getAverage(const Student *s) {
+    float sum = 0;
     for (int i = 0;i<s->num_subjects;i++) {
         sum += s->marks[i];
     }
-    avg = sum / s->num_subjects;
-    s->avg = avg;
-    return avg;
+    return sum/ s->num_subjects;
 }
 
 void getMinMax(const Student *s) {
@@ -128,12 +130,11 @@ void printReport(const Student *s) {
 
 void readStudents(Student *s, int mem) {
     char again;
-    int ch;
         printf("\n请输入学生%d姓名:", mem);
         fgets(s->name, MAX_LENTH, stdin);
         s->name[strcspn(s->name, "\n")] = '\0';
         s->num_subjects = readSubjectNum();
-        while ((ch = getchar()) != '\n' && ch != EOF);
+        clearInputBuffer();
         printf("\n接下来将输入各科名称和成绩：");
         for (int i = 0;i<s->num_subjects;i++) {
             s->marks[i] = readMarks(i + 1, s);
@@ -155,9 +156,17 @@ void sortStudentsByAverage(Student s[], int mem) {
     }
 }
 
+const Student *findStudentByName(const Student s[], int count, const char *name) {
+    for (int i = 0;i < count;i++) {
+        if (strcmp(name, s[i].name) == 0) {
+            return &s[i];
+        }
+    }
+    return NULL;
+}
+
 int main() {
     int num;
-    int ch;
     printLine();
     Student s[MAX_STUDENTS];
     printf("欢迎来到学生成绩计算系统\n");
@@ -165,11 +174,11 @@ int main() {
     while (1) {
         printf("请输入学生人数: ");
         if (scanf("%d", &num) == 1 && num >= 1 && num <= MAX_STUDENTS) {
-            while ((ch = getchar()) != '\n' && ch != EOF);
+            clearInputBuffer();
             break;
         }
         printf("请输入1到%d之间的学生人数！", MAX_STUDENTS);
-        while ((ch = getchar()) != '\n' && ch != EOF);
+        clearInputBuffer();
     }
     for (int i = 0;i<num;i++) {
         readStudents(&s[i], i+1);
@@ -181,6 +190,29 @@ int main() {
     for (int i = 0;i<num;i++) {
         printReport(&s[i]);
         printf("\n\n\n");
+    }
+    while (1) {
+        printf("\n是否需要查找指定学生成绩?(y/n)");
+        char n;
+        scanf(" %c", &n);
+        clearInputBuffer();
+        if (n == 'y') {
+            char name[MAX_LENTH];
+            printf("\n请输入要查找的学生姓名:");
+            fgets(name, MAX_LENTH, stdin);
+            name[strcspn(name, "\n")] = '\0';
+            const Student *result = findStudentByName(s, num, name);
+            if (result != NULL) {
+                printReport(result);
+            } else { printf("未找到该学生\n"); }
+            break;
+        } else if (n == 'n') {
+
+            break;
+        } else {
+            printf("\n请输入y或n!");
+            continue;
+        }
     }
     return 0;
 }
