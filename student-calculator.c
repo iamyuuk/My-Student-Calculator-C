@@ -198,7 +198,7 @@ int loadStudentsFromFile(Student s[], int max_count) {
         fclose(fp);
         return -1;
     }
-    if (count < 1 || count > max_count) {
+    if (count < 0 || count > max_count) {
         printf("文件中的学生人数不合法\n");
         fclose(fp);
         return -1;
@@ -237,73 +237,201 @@ int loadStudentsFromFile(Student s[], int max_count) {
     return count;
 }
 
-int main() {
-    int num;
-    printLine();
-    Student s[MAX_STUDENTS];
-    printf("欢迎来到学生成绩计算系统\n");
-    printLine();
-
-
-    Student loaded[MAX_STUDENTS];
-
-    int loadedCount = loadStudentsFromFile(loaded, MAX_STUDENTS);
-
-    if (loadedCount == -1) {
-        printf("读取学生数据失败！\n");
+int clearAllData(int *studentCount) {
+    FILE *fp = fopen("students.txt", "w");
+    if (fp == NULL) {
+        printf("文件写入失败");
+        return -1;
     } else {
-        printf("成功读取 %d 名学生！\n", loadedCount);
-
-        for (int i = 0; i < loadedCount; i++) {
-        printReport(&loaded[i]);
+        fprintf(fp, "0");
+        fclose(fp);
+        *studentCount = 0;
+        return 0;
     }
 }
 
+int main() {
+//     int num;
+//     printLine();
+//     Student s[MAX_STUDENTS];
+//     printf("欢迎来到学生成绩计算系统\n");
+//     printLine();
 
-    while (1) {
-        printf("请输入学生人数: ");
-        if (scanf("%d", &num) == 1 && num >= 1 && num <= MAX_STUDENTS) {
+//     Student loaded[MAX_STUDENTS];
+
+//     int loadedCount = loadStudentsFromFile(loaded, MAX_STUDENTS);
+
+//     if (loadedCount == -1) {
+//         printf("读取学生数据失败！\n");
+//     } else {
+//         printf("成功读取 %d 名学生！\n", loadedCount);
+
+//         for (int i = 0; i < loadedCount; i++) {
+//         printReport(&loaded[i]);
+//     }
+// }
+
+
+//     while (1) {
+//         printf("请输入学生人数: ");
+//         if (scanf("%d", &num) == 1 && num >= 1 && num <= MAX_STUDENTS) {
+//             clearInputBuffer();
+//             break;
+//         }
+//         printf("请输入1到%d之间的学生人数！", MAX_STUDENTS);
+//         clearInputBuffer();
+//     }
+//     for (int i = 0;i<num;i++) {
+//         readStudents(&s[i], i+1);
+//     }
+//     sortStudentsByAverage(s, num);
+//     printLine();
+//     printf("学生成绩单\n");
+//     printLine();
+//     for (int i = 0;i<num;i++) {
+//         printReport(&s[i]);
+//         printf("\n\n\n");
+//     }
+//     saveStudentsToFile(s, num);
+//     if (num > 1) {
+//         while (1) {
+//             printf("\n是否需要查找指定学生成绩?(y/n)");
+//             char n;
+//             scanf(" %c", &n);
+//             clearInputBuffer();
+//             if (n == 'y') {
+//                 char name[MAX_LENTH];
+//                 printf("\n请输入要查找的学生姓名:");
+//                 fgets(name, MAX_LENTH, stdin);
+//                 name[strcspn(name, "\n")] = '\0';
+//                 const Student *result = findStudentByName(s, num, name);
+//                 if (result != NULL) {
+//                     printReport(result);
+//                 } else { printf("未找到该学生\n"); }
+//             break;
+//             } else if (n == 'n') {
+//                 break;
+//             } else {
+//                 printf("\n请输入y或n!");
+//                 continue;
+//             }
+//         }
+//     }
+//     return 0;
+
+    int choice;
+    Student s[MAX_STUDENTS];
+    int studentCount = 0;
+    int studentLoaded = loadStudentsFromFile(s, MAX_STUDENTS);
+    if (studentLoaded != -1) {
+        studentCount = studentLoaded;
+    }
+    printLine();
+    printf("欢迎使用学生成绩管理系统\n");
+    printLine();
+    do {
+        printf("1. 录入学生\n");
+        printf("2. 查看所有学生\n");
+        printf("3. 学生排序\n");
+        printf("4. 姓名查找\n");
+        printf("5. 保存数据\n");
+        printf("6. 清除所有数据\n");
+        printf("0. 退出系统\n");
+        printf("请选择功能: ");
+        if (scanf("%d", &choice) != 1) {
             clearInputBuffer();
-            break;
+            printf("请输入有效数字！\n");
+            choice = -1;
+            continue;
         }
-        printf("请输入1到%d之间的学生人数！", MAX_STUDENTS);
         clearInputBuffer();
-    }
-    for (int i = 0;i<num;i++) {
-        readStudents(&s[i], i+1);
-    }
-    sortStudentsByAverage(s, num);
-    printLine();
-    printf("学生成绩单\n");
-    printLine();
-    for (int i = 0;i<num;i++) {
-        printReport(&s[i]);
-        printf("\n\n\n");
-    }
-    saveStudentsToFile(s, num);
-    if (num > 1) {
-        while (1) {
-            printf("\n是否需要查找指定学生成绩?(y/n)");
-            char n;
-            scanf(" %c", &n);
-            clearInputBuffer();
-            if (n == 'y') {
-                char name[MAX_LENTH];
-                printf("\n请输入要查找的学生姓名:");
-                fgets(name, MAX_LENTH, stdin);
-                name[strcspn(name, "\n")] = '\0';
-                const Student *result = findStudentByName(s, num, name);
-                if (result != NULL) {
-                    printReport(result);
-                } else { printf("未找到该学生\n"); }
-            break;
-            } else if (n == 'n') {
+
+        switch (choice) {
+            case 1:
+                printf("录入学生\n");
+                int plus;
+                printf("需要录入的学生数量:");
+                scanf("%d", &plus);
+                clearInputBuffer();
+                if (plus > 0 && plus <= (MAX_STUDENTS - studentCount)) {
+                    for (int i = 0;i<plus;i++) {
+                        readStudents(&s[studentCount],studentCount + 1);
+                        studentCount++;
+                    }
+                } else { printf("已没有剩余空间可供存入学生！"); }
                 break;
-            } else {
-                printf("\n请输入y或n!");
-                continue;
-            }
+            case 2:
+                printf("查看所有学生\n");
+                if (studentCount == 0) {
+                    printf("没有学生\n");
+                } else {
+                    for (int i = 0;i < studentCount;i++) {
+                        printReport(&s[i]);
+                    }
+                }
+                break;
+            case 3:
+                printf("学生排序\n");
+                if (studentCount == 0) {
+                    printf("没有学生\n");
+                } else {
+                    sortStudentsByAverage(s, studentCount);
+                    printf("排序完成\n");
+                }
+                break;
+            case 4:
+                printf("姓名查找\n");
+                if (studentCount == 0) {
+                    printf("没有学生");
+                } else {
+                    char name[MAX_LENTH];
+                    printf("请输入姓名:");
+                    fgets(name, MAX_LENTH, stdin);
+                    name[strcspn(name, "\n")] = '\0';
+                    const Student *result = findStudentByName(s, studentCount, name);
+                    if (result == NULL) {
+                        printf("未查找到该学生\n");
+                    } else {
+                        printReport(result);
+                    }
+                }
+                break;
+            case 5:
+                printf("保存数据\n");
+                if (studentCount == 0) {
+                    printf("没有学生\n");
+                } else {
+                    saveStudentsToFile(s, studentCount);
+                }
+                break;
+            case 6:
+                printf("清除所有数据\n");
+                char confirm;
+                printf("确认要清除数据吗?(y/n)");
+                scanf(" %c", &confirm);
+                clearInputBuffer();
+                if (confirm == 'y') {
+                    int a = clearAllData(&studentCount);
+                    if (a == -1) {
+                        printf("清除失败\n");
+                    } else {
+                        printf("清除成功\n");
+                    }
+                } else if (confirm == 'n') {
+                    printf("已取消清除数据\n");
+                } else {
+                    printf("请输入正确字母\n");
+                }
+                
+                break;
+            case 0:
+                printf("退出系统\n");
+                break;
+            default:
+                printf("无效选项\n");
         }
-    }
+    } while (choice != 0);
+
+
     return 0;
 }
